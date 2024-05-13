@@ -10351,9 +10351,14 @@ function GetLatestGraphingRelease(platform, arch) {
 function RenameGraphingReleaseBin(downloadPath, currentOS) {
     return __awaiter(this, void 0, void 0, function* () {
         let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-graphing';
-        let targetPath = path_1.default.join(path_1.default.dirname(downloadPath), targetName);
+        let targetDir = '/home/runner/Pluralith/bin';
+        let targetPath = path_1.default.join(targetDir, targetName);
         core.info(`Rename release binary from ${downloadPath} to ${targetPath}`);
         try {
+            var fs = require('fs');
+            if (!fs.existsSync(targetDir)){
+                fs.mkdirSync(targetDir, ( recursive: true }};
+            }
             yield io.mv(downloadPath, targetPath);
             yield exec.exec('chmod', ['+x', targetPath]); // Make binary executable
             return path_1.default.dirname(targetPath);
