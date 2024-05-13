@@ -51,6 +51,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set globals
+      id: globals
+      shell: bath
+      run: |
+        echo "PLURALITH_ORG_ID=${{ vars.PLURALITH_ORG_ID }}"
+        echo "PLURALITH_PROJECT_ID=${{ vars.PLURALITH_PROJECT_ID }}"
+        echo "PLURALITH_API_KEY=${{ secrets.PLURALITH_API_KEY }}"
     - name: Generate Pluralith Diagram
       shell: bash
       run: "pluralith run ${{ inputs.terraform-command }} --var-file=${{ inputs.terraform-var-file }} --title=${{ inputs.title }} --version=${{ inputs.version }} --export-pdf=${{ inputs.export-pdf }} --show-changes=${{ inputs.show-changes }} --show-drift=${{ inputs.show-drift }} --show-costs=${{ inputs.show-costs }} --cost-mode=${{ inputs.cost-mode }} --cost-period=${{ inputs.cost-period }} --cost-usage-file=${{ inputs.cost-usage-file }}"
