@@ -10335,7 +10335,7 @@ function RenameReleaseBin(downloadPath, currentOS) {
 // Get graphing download URL and version for current OS and arch from latest CLI release on Github
 function GetLatestGraphingRelease(platform, arch) {
     return __awaiter(this, void 0, void 0, function* () {
-        let releaseURL = "https://api.github.com/repos/pluralith/pluralith-cligraphing-release/releases/latest";
+        let releaseURL = "https://api.github.com/repos/pluralith/pluralith-cli-graphing-release/releases/latest";
         let releaseData = yield axios_1.default.get(releaseURL);
         let tagName = releaseData.data.tag_name;
         let patchTagName = tagName.slice(1);
