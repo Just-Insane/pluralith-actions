@@ -10338,7 +10338,7 @@ function GetLatestGraphingRelease(platform, arch) {
         let releaseURL = "https://api.github.com/repos/pluralith/pluralith-cli-graphing-release/releases/latest";
         let releaseData = yield axios_1.default.get(releaseURL);
         let tagName = releaseData.data.tag_name;
-        let patchTagName = tagName.slice(1);
+        let patchTagName = tagName.substring(1);
         let binName = `pluralith_cli_graphing_${platform}_${arch}_${patchTagName}`;
         let binObject = releaseData.data.assets.find((release) => release.name.includes(binName));
         return {
