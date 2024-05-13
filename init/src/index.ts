@@ -81,8 +81,8 @@ async function GetLatestGraphingRelease(platform: string, arch: string): Promise
 // Rename graphing binary for addition to PATH
 async function RenameGraphingReleaseBin(downloadPath: string, currentOS: string): Promise<string> {
   let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-graphing'
-  let targetDir = '~/Pluralith/bin'
-  let targetPath = path.join(path.dirname(downloadPath), targetName)
+  let targetDir = '/home/runner/Pluralith/bin/pluralith-cli-graphing'
+  let targetPath = path.join(targetDir, targetName)
   
   core.info(`Rename release binary from ${downloadPath} to ${targetPath}`)
 
