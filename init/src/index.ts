@@ -32,7 +32,8 @@ async function GetLatestRelease(platform: string, arch: string): Promise<{ url: 
 	let releaseData = await axios.get(releaseURL)
 
   let tagName = releaseData.data.tag_name
-  let binName = `pluralith_cli_${platform}_${arch}_${tagName}`;
+  let patchTagName = tagName.slice(1);
+  let binName = `pluralith_cli_${platform}_${arch}_${patchTagName}`;
 
   let binObject = releaseData.data.assets.find((release: any) => release.name.includes(binName))
 
