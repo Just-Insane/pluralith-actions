@@ -69,6 +69,8 @@ async function GetLatestGraphingRelease(platform: string, arch: string): Promise
 
   let binObject = releaseData.data.assets.find((release: any) => release.name.includes(binName))
 
+  core.info('Graphing binObject: ${binObject}; URL: ${binObject.browser_download_url})
+
   return {
     url: binObject.browser_download_url,
     version: tagName
@@ -94,7 +96,7 @@ async function RenameGraphingReleaseBin(downloadPath: string, currentOS: string)
 
 // Move graphing binary to expected location
 async function MoveGraphingReleaseBin(downloadPath: string, currentOS: string): Promise<string> {
-  let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-grpahing'
+  let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-graphing'
   let targetDir = '~/Pluralith/bin'
   let targetPath = path.join(targetDir), targetName)
 
@@ -144,6 +146,9 @@ async function Init(): Promise<void> {
     binPath = await RenameReleaseBin(binPath, platform.os)
 
     let graphingRelease = await GetLatestGraphingRelease(platform.os, platform.arch)
+
+    core.info('Pluralith Graphing CLI ${graphingRelease.version} wil lbe set up');
+	  
     let graphingBinPath = await tc.downloadTool(graphingRelease.url);
     graphingBinPath = await RenameGraphingReleaseBin(graphingBinPath, platform.os) 
 
