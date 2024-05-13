@@ -144,8 +144,8 @@ async function Init(): Promise<void> {
     binPath = await RenameReleaseBin(binPath, platform.os)
 
     let graphingRelease = await GetLatestGraphingRelease(platform.os, platform.arch)
-    let bitPath = await tc.downloadTool(graphingRelease.url);
-    graphingBinPath = await RenameGraphingReleaseBin(binPath, platform.os) 
+    let graphingBinPath = await tc.downloadTool(graphingRelease.url);
+    graphingBinPath = await RenameGraphingReleaseBin(graphingBinPath, platform.os) 
 
     console.log("binPath: ", binPath)
     core.addPath(binPath)
