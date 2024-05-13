@@ -65,7 +65,7 @@ async function GetLatestGraphingRelease(platform: string, arch: string): Promise
 	let releaseData = await axios.get(releaseURL)
 
   let tagName = releaseData.data.tag_name
-  let binName = `pluralith_cli_${platform}_${arch}_${tagName}`;
+  let binName = `pluralith_cli_graphing_${platform}_${arch}_${tagName}`;
 
   let binObject = releaseData.data.assets.find((release: any) => release.name.includes(binName))
 
