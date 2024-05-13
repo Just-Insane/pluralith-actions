@@ -1,6 +1,7 @@
 import os from 'os';
 import axios from 'axios';
 import path from 'path';
+import fs from 'fs';
 
 import * as core from '@actions/core';
 import * as tc from '@actions/tool-cache';
@@ -58,6 +59,56 @@ async function RenameReleaseBin(downloadPath: string, currentOS: string): Promis
   }
 }
 
+// Get graphing download URL and version for current OS and arch from latest CLI release on Github
+async function GetLatestGraphingRelease(platform: string, arch: string): Promise<{ url: string, version: string }> {
+  let releaseURL = "https://api.github.com/repos/pluralith/pluralith-cli-graphing-release/releases/latest"
+	let releaseData = await axios.get(releaseURL)
+
+  let tagName = releaseData.data.tag_name
+  let binName = `pluralith_cli_${platform}_${arch}_${tagName}`;
+
+  let binObject = releaseData.data.assets.find((release: any) => release.name.includes(binName))
+
+  return {
+    url: binObject.browser_download_url,
+    version: tagName
+  }
+}
+
+// Rename graphing binary for addition to PATH
+async function RenameGraphingReleaseBin(downloadPath: string, currentOS: string): Promise<string> {
+  let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-graphing'
+  let targetPath = path.join(path.dirname(downloadPath), targetName)
+  
+  core.info(`Rename release binary from ${downloadPath} to ${targetPath}`)
+
+  try {
+    await io.mv(downloadPath, targetPath)
+    await exec.exec('chmod', ['+x', targetPath]) // Make binary executable
+    return path.dirname(targetPath)
+  } catch (error) {
+    core.error(`Renaming release binary from ${downloadPath} to ${targetPath} failed`)
+    throw error
+  }
+}
+
+// Move graphing binary to expected location
+async function MoveGraphingReleaseBin(downloadPath: string, currentOS: string): Promise<string> {
+  let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-grpahing'
+  let targetDir = '~/Pluralith/bin'
+  let targetPath = path.join(targetDir), targetName)
+
+  try {
+    if (!fs.existsSync(targetDir)){
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    await io.mv(downloadPath, targetPath)
+  } catch (error) {
+    core.error('Moving graphing release binary from $(downloadPath} to ${targetPath} failed')
+    throw error
+  }
+}
+
 // Handle initialization for the CLI
 async function InitializeCLI(): Promise<void> {
   let apiKey = core.getInput('api-key')
@@ -92,8 +143,15 @@ async function Init(): Promise<void> {
     let binPath = await tc.downloadTool(release.url);
     binPath = await RenameReleaseBin(binPath, platform.os)
 
+    let graphingRelease = await GetLatestGraphingRelease(platform.os, platform.arch)
+    let bitPath = await tc.downloadTool(graphingRelease.url);
+    graphingBinPath = await RenameGraphingReleaseBin(binPath, platform.os) 
+
     console.log("binPath: ", binPath)
     core.addPath(binPath)
+
+    console.log("graphingBinPath: ", graphingBinPath)
+    core.addPath(graphingBinPath)
     
     await InitializeCLI()
 
