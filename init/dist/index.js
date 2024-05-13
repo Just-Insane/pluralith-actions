@@ -10332,6 +10332,38 @@ function RenameReleaseBin(downloadPath, currentOS) {
         }
     });
 }
+// Get graphing download URL and version for current OS and arch from latest CLI release on Github
+function GetLatestGraphingRelease(platform, arch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let releaseURL = "https://api.github.com/repos/pluralith/pluralith-cligraphing-release/releases/latest";
+        let releaseData = yield axios_1.default.get(releaseURL);
+        let tagName = releaseData.data.tag_name;
+        let patchTagName = tagName.slice(1);
+        let binName = `pluralith_cli_graphing_${platform}_${arch}_${patchTagName}`;
+        let binObject = releaseData.data.assets.find((release) => release.name.includes(binName));
+        return {
+            url: binObject.browser_download_url,
+            version: tagName
+        };
+    });
+}
+// Rename graphing binary for addition to PATH
+function RenameGraphingReleaseBin(downloadPath, currentOS) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-graphing';
+        let targetPath = path_1.default.join(path_1.default.dirname(downloadPath), targetName);
+        core.info(`Rename release binary from ${downloadPath} to ${targetPath}`);
+        try {
+            yield io.mv(downloadPath, targetPath);
+            yield exec.exec('chmod', ['+x', targetPath]); // Make binary executable
+            return path_1.default.dirname(targetPath);
+        }
+        catch (error) {
+            core.error(`Renaming graphing release binary from ${downloadPath} to ${targetPath} failed`);
+            throw error;
+        }
+    });
+}
 // Handle initialization for the CLI
 function InitializeCLI() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -10361,8 +10393,18 @@ function Init() {
             core.info(`Pluralith CLI ${release.version} will be set up`);
             let binPath = yield tc.downloadTool(release.url);
             binPath = yield RenameReleaseBin(binPath, platform.os);
+
+            let graphingRelease = yield GetLatestGraphingRelease(platform.os, platform.arch);
+            core.info(`Pluralith Graphing CLI ${release.version} will be set up`);
+            let graphingBinPath = yield tc.downloadTool(graphingRelease.url);
+            graphingBinPath = yield RenameGraphingReleaseBin(graphingBinPath, platform.os);
+            
             console.log("binPath: ", binPath);
             core.addPath(binPath);
+
+            console.log("graphingBinPath: ", graphingBinPath);
+            core.addPath(graphingBinPath);
+            
             yield InitializeCLI();
             core.info(`Pluralith CLI ${release.version} set up and initialized`);
         }
