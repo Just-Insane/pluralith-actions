@@ -10394,9 +10394,22 @@ function Init() {
             let binPath = yield tc.downloadTool(release.url);
             binPath = yield RenameReleaseBin(binPath, platform.os);
 
-            let graphingRelease = yield GetLatestGraphingRelease(platform.os, platform.arch);
+            try {
+                let graphingRelease = yield GetLatestGraphingRelease(platform.os, platform.arch);
+            }
+            catch {
+                core.error('Could not get graphing cli release url.');
+                throw error;
+            }
             core.info(`Pluralith Graphing CLI ${release.version} will be set up`);
-            let graphingBinPath = yield tc.downloadTool(graphingRelease.url);
+            try {
+                let graphingBinPath = yield tc.downloadTool(graphingRelease.url);
+            }
+            catch {
+                core.error('Could not download graphing cli from: ${graphingRelease.url}');
+                throw error;
+            }
+            
             graphingBinPath = yield RenameGraphingReleaseBin(graphingBinPath, platform.os);
             
             console.log("binPath: ", binPath);
