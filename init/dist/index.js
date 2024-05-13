@@ -10356,9 +10356,7 @@ function RenameGraphingReleaseBin(downloadPath, currentOS) {
         core.info(`Rename release binary from ${downloadPath} to ${targetPath}`);
         try {
             var fs = require('fs');
-            if (!fs.existsSync(targetDir)){
-                fs.mkdirSync(targetDir, ( recursive: true }};
-            }
+            fs.mkdirSync(targetDir, { recursive: true }};
             yield io.mv(downloadPath, targetPath);
             yield exec.exec('chmod', ['+x', targetPath]); // Make binary executable
             return path_1.default.dirname(targetPath);
