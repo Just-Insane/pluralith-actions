@@ -10401,7 +10401,8 @@ function Init() {
                 core.error('Could not get graphing cli release url.');
                 throw error;
             }
-            core.info(`Pluralith Graphing CLI ${release.version} will be set up`);
+            core.info(`Pluralith Graphing CLI ${graphingRelease.version} will be set up`);
+            core.info('Pluralith Graphing CLI Download URL: ${graphingRelease.url}');
             try {
                 let graphingBinPath = yield tc.downloadTool(graphingRelease.url);
             }
