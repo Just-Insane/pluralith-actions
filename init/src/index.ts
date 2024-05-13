@@ -69,7 +69,7 @@ async function GetLatestGraphingRelease(platform: string, arch: string): Promise
 
   let binObject = releaseData.data.assets.find((release: any) => release.name.includes(binName))
 
-  core.info('Graphing binObject: ${binObject}; URL: ${binObject.browser_download_url})
+  core.info('Graphing binObject: ${binObject}; URL: ${binObject.browser_download_url}')
 
   return {
     url: binObject.browser_download_url,
@@ -80,11 +80,15 @@ async function GetLatestGraphingRelease(platform: string, arch: string): Promise
 // Rename graphing binary for addition to PATH
 async function RenameGraphingReleaseBin(downloadPath: string, currentOS: string): Promise<string> {
   let targetName = currentOS === 'windows' ? 'pluralith-cli-graphing.exe' : 'pluralith-cli-graphing'
+  let targetDir = '~/Pluralith/bin'
   let targetPath = path.join(path.dirname(downloadPath), targetName)
   
   core.info(`Rename release binary from ${downloadPath} to ${targetPath}`)
 
   try {
+    if (!fs.existsSync(targetDir)){
+      fs.mkdirSync(dir, { recursive: true });
+    }
     await io.mv(downloadPath, targetPath)
     await exec.exec('chmod', ['+x', targetPath]) // Make binary executable
     return path.dirname(targetPath)
